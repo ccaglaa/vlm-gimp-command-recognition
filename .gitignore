@@ -1,0 +1,7 @@
+*.xcf
+*.jpg
+*.jpeg
+*.txt
+*.png
+*.json
+__pycache__
