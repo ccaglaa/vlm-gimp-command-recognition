@@ -18,11 +18,15 @@ from gi.repository import Gtk
 from gi.repository import Gio 
 import sys
 
+"""
+This file
+"""
+
 def changeOneImage() : 
 
     destination = ''
 
-    if (destination.equals('')) :
+    if (destination == '') :
         print('====== ATTENTION : LE CHEMIN DE DESTINATION N\'AS PAS ETE INITIALISE =====')
         return 
     
@@ -89,5 +93,5 @@ def procAlter2 () :
 if __name__ == '__main__':
     # test1.py executed as script
     # do something
-    procAlter()
+    changeOneImage()
 
