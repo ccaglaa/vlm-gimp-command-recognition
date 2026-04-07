@@ -21,7 +21,12 @@ def import_from_path(module_name, file_path):
     spec.loader.exec_module(module)
     return module
 
-FilterTypes = import_from_path("FilterTypes", r"C:\Users\Andy\Documents\DossierLicence\Dossier_Master\pai2d-2026\FilterTypes.py")
+filterTypePath = ""
+
+if (len(filterTypePath) == 0) :
+    raise Exception("FilterType path has not been setup yet.")
+
+FilterTypes = import_from_path("FilterTypes", filterTypePath)
 
 class RunType (Enum) :
     RANDOM = 1
@@ -37,6 +42,7 @@ def processOneFileOneFilter(
     
     # On charge la première image 
     image = Gimp.Image.get_by_id(fileIndex + 1)
+    print(image== None)
 
     # On crée une layer qui est un calque de l'image 
     layer = Gimp.Layer.new_from_visible(
@@ -125,3 +131,6 @@ def processMultipleFilesOneFilter(
         )
     
     return 
+
+processMultipleFilesOneFilter(jsonFilePath)
+

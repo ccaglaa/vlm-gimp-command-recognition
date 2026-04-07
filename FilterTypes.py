@@ -23,6 +23,14 @@ class ParamNumber() :
     
     def toString (self) -> str : 
         return "Parameter name : " + self.name 
+    
+    def toDict(self) -> dict :
+        res = dict()
+        res["name"] = self.name
+        res["field"] = dict()
+        res["field"]["minVal"] = self.minVal
+        res["field"]["maxVal"] = self.maxVal
+        return res 
 
 class ParamInteger(ParamNumber) : 
     
@@ -35,6 +43,11 @@ class ParamInteger(ParamNumber) :
     def toString(self):
         return super().toString() + f", Type : Int, minVal : {self.minVal}, maxVal : {self.maxVal}"
     
+    def toDict(self):
+        res = super().toDict()
+        res["type"] = "gint"
+        return res 
+    
 
 class ParamDouble(ParamNumber) :
     
@@ -46,6 +59,10 @@ class ParamDouble(ParamNumber) :
     
     def toString(self):
         return super().toString() + f", Type : Float, minVal : {self.minVal:.2f}, maxVal : {self.maxVal:.2f}"
+    
+    def toDict(self):
+        res = super().toDict()
+        res["type"] = "gdouble"
 
 class ParamBoolean : 
     def __init__(
@@ -59,6 +76,14 @@ class ParamBoolean :
 
     def toString(self) :
         return "Name : " + self.name + ", Type : Boolean"
+    
+    def toDict (self) :
+        res = dict()
+        res["name"] = self.name
+        res["type"] = "gboolean"
+        return res 
+    
+    
 
 class ParamString () :
 
@@ -77,6 +102,14 @@ class ParamString () :
             s += self.domain[i] + ", "
         return s + self.domain[-1]
     
+    def toDict(self) :
+        res = dict()
+        res["name"] = self.name
+        res["type"] = "gchararray"
+        res["field"] = list()
+        for e in self.domain :
+            res["field"].append(e)
+        return res 
 
 class Filter :
     """
@@ -105,6 +138,14 @@ class Filter :
         for e in self.parameters : 
             s += "--" + e.toString() + "\n"
         return s 
+    
+    def toDict(self) :
+        res = dict()
+        res["procedureName"] = self.name
+        prefix = "param"
+        for i in range(len(self.parameters)) : 
+            res[prefix + str(i+1)] = self.parameters[i].toDict()
+        return res 
 
 def convertStringToValue (s : str | int) -> int : 
     if (s != None and type(s) == str) : 
@@ -152,12 +193,12 @@ def convertDictToFilter (filter : dict) :
     
     return res 
 
-filePath = r"C:\Users\Andy\Documents\DossierLicence\Dossier_Master\pai2d-2026\listeProcedures.json"
-
-data = None
-
-with open(filePath) as f : 
-    data = json.load(f)
-
-print(convertDictToFilter(data[0]).toString())
+def convertFilterToDict(
+        dFilter : Filter
+) : 
+    res = dict()
+    res["procedureName"] = dFilter.name
+    for i in range(len(dFilter.parameters)) : 
+        res["param" + str(i+1)] = dFilter.parameters[i]
+    return res 
 

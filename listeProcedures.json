@@ -1,0 +1,29 @@
+[
+	{
+		"procedureName": "gegl:shift",
+		"param1": {
+			"name": "shift",
+			"type": "gint",
+			"field": {
+				"minVal": 0,
+				"maxVal": 200
+			}
+		},
+		"param2": {
+			"name": "direction",
+			"type": "gchararray",
+			"field": [
+				"horizontal",
+				"vertical"
+			]
+		},
+		"param3": {
+			"name": "seed",
+			"type": "guint",
+			"field": {
+				"minVal": 0,
+				"maxVal": "+inf"
+			}
+		}
+	}
+]

@@ -3,5 +3,6 @@
 *.jpeg
 *.txt
 *.png
-*.json
 __pycache__
+mainCopy.py
+FileProcessorCopy.py
