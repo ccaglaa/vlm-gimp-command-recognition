@@ -1,0 +1,37 @@
+{
+    "destFolder": "c:\\Users\\Andy\\Documents\\DossierLicence\\Dossier_Master\\pai2d-2026\\gegl_shift",
+    "processMode": 1,
+    "filter": {
+        "procedureName": "gegl:shift",
+        "param1": {
+            "name": "shift",
+            "field": {
+                "minVal": 0,
+                "maxVal": 200
+            },
+            "type": "gint"
+        },
+        "param2": {
+            "name": "direction",
+            "type": "gchararray",
+            "field": [
+                "horizontal",
+                "vertical"
+            ]
+        },
+        "param3": {
+            "name": "seed",
+            "field": {
+                "minVal": 0,
+                "maxVal": 10000
+            },
+            "type": "gint"
+        }
+    },
+    "fileList": [
+        "20260305103114_1.jpg",
+        "20260305103142_1.jpg",
+        "20260305103142_2.jpg",
+        "20260305104418_1.jpg"
+    ]
+}

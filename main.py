@@ -4,6 +4,8 @@ import os
 import sys
 import importlib.util
 import subprocess
+
+
 def import_from_path(module_name, file_path):
     """Import a module given its name and file path."""
     spec = importlib.util.spec_from_file_location(module_name, file_path)
@@ -12,9 +14,12 @@ def import_from_path(module_name, file_path):
     spec.loader.exec_module(module)
     return module
 
+
+CUR_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # ==============================================
 # Absolute path of the FilterType.py file 
-filterTypePath = ""
+filterTypePath = CUR_DIR + "\\FilterTypes.py"
 # ==============================================
 
 
@@ -31,6 +36,8 @@ NUMBER_FILES_PER_CALL = 20
 def run(cmd):
     completed = subprocess.run(cmd, capture_output=True)
     return completed
+
+print("\n\n")
 
 def launchProcessOneFilter(
         jsonFilePath : str,
@@ -49,6 +56,17 @@ def launchProcessOneFilter(
     i = 0 
     filesToProcess = fileList[i:i+NUMBER_FILES_PER_CALL]
 
+    if (not os.path.exists(folderPath)) :
+        try:
+            os.mkdir(folderPath)
+            print(f"Directory '{folderPath}' created successfully.")
+        except FileExistsError:
+            print(f"Directory '{folderPath}' already exists.")
+        except PermissionError:
+            print(f"Permission denied: Unable to create '{folderPath}'.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
     while len(filesToProcess) > 0 : 
         ordonnance["fileList"] = filesToProcess
         
@@ -56,12 +74,14 @@ def launchProcessOneFilter(
             json.dump(ordonnance, f)
 
         cmd = "gimp -ifs --quit --batch-interpreter=python-fu-eval -b \""
+        cmd += "CUR_DIR = r\'" + CUR_DIR + "\';"
         cmd += "jsonFilePath = r'" + jsonFilePath + "\';"
         cmd += "exec(open(r'FileProcessor.py').read());"
         cmd += "print(jsonFilePath);"
         cmd += "\" "
         for fileName in filesToProcess : 
             cmd += originFolder + "\\" + fileName + " "
+        #print(cmd)
         subprocess.run(cmd, shell=True)
         i += NUMBER_FILES_PER_CALL
         filesToProcess = fileList[i:i+NUMBER_FILES_PER_CALL]
@@ -72,20 +92,20 @@ data = None
 
 # ==============================================
 # Absolute path of the json file containing the list of available procedures 
-procedureJson = ""
+procedureJson = CUR_DIR + "\\listeProcedures.json"
 # ==============================================
 
-if (len(filterTypePath) == 0) :
-    raise Exception("listeProcedure path has not been setup yet.")
+if (len(procedureJson) == 0) :
+    raise Exception("procedureJson path has not been setup yet.")
 
 with open(procedureJson) as f : 
-    data = json.load(f)
+    procedureList = json.load(f)
 
 
 
 # ==============================================
 # Absolute path of the temporary json file that will contain the parameters for the GIMP part 
-jsonFilePath = ""
+jsonFilePath = CUR_DIR + "\\processData.json"
 # ==============================================
 
 if (len(jsonFilePath) == 0) :
@@ -93,7 +113,7 @@ if (len(jsonFilePath) == 0) :
 
 # ==============================================
 # Absolute path of the folder that contains the images to process 
-originFolder = ""
+originFolder = CUR_DIR + "\\Source_Folder"
 # ==============================================
 
 if (len(originFolder) == 0) :
@@ -102,18 +122,20 @@ if (len(originFolder) == 0) :
 
 # ==============================================
 # Absolute path of the folder where you want your images to end up in 
-folderPath = ""
 # ==============================================
-
-if(len(folderPath) == 0) :
-    raise Exception("folderPath path has not been setup yet ")
 
 # ==============================================
 # The processing mode : RANDOM = 1, DEFAULT = 2 
 processMode = 1
 # ==============================================
 
-# This example is for the first filter contained in the json file 
-dFilter = FilterTypes.convertDictToFilter(data[0])
+for procedure in procedureList :
 
-launchProcessOneFilter(jsonFilePath, originFolder, folderPath, processMode, dFilter)
+    # We get the filter class from the dictionnairy 
+    filterClass = FilterTypes.convertDictToFilter(procedure)
+
+    # The images that have been processed with the filter will be stored in 
+    nomProcedureSplitted = filterClass.name.split(":")
+    folderPath = CUR_DIR + "\\" + nomProcedureSplitted[0] + "_" + nomProcedureSplitted[1]
+
+    launchProcessOneFilter(jsonFilePath, originFolder, folderPath, processMode, filterClass)
