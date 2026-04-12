@@ -75,14 +75,13 @@ class ParamBoolean :
         return random.random() < 0.5
 
     def toString(self) :
-        return "Name : " + self.name + ", Type : Boolean"
+        return "Parameter name : " + self.name + ", Type : Boolean"
     
     def toDict (self) :
         res = dict()
         res["name"] = self.name
         res["type"] = "gboolean"
         return res 
-    
     
 
 class ParamString () :
@@ -134,7 +133,11 @@ class Filter :
         self.parameters.append(param)
 
     def toString(self) : 
+
         s = "Plugin name : " + self.name + "\n"
+
+
+
         for e in self.parameters : 
             s += "--" + e.toString() + "\n"
         return s 
@@ -142,9 +145,10 @@ class Filter :
     def toDict(self) :
         res = dict()
         res["procedureName"] = self.name
-        prefix = "param"
+        prefix = "parameters"
+        res[prefix] = []
         for i in range(len(self.parameters)) : 
-            res[prefix + str(i+1)] = self.parameters[i].toDict()
+            res[prefix].append(self.parameters[i].toDict())
         return res 
 
 def convertStringToValue (s : str | int) -> int : 
@@ -184,12 +188,8 @@ def convertDictToParameter (parameter : dict) :
 def convertDictToFilter (filter : dict) :
     res = Filter(filter["procedureName"])
 
-    s : str = "param"
-    i : int = 1
-
-    while (s + str(i) in filter.keys()) :
-        res.addParameter(convertDictToParameter(filter[s + str(i)]))
-        i += 1 
+    for i in range(len(filter["parameters"])) :
+        res.addParameter(convertDictToParameter(filter["parameters"][i]))
     
     return res 
 
@@ -198,7 +198,14 @@ def convertFilterToDict(
 ) : 
     res = dict()
     res["procedureName"] = dFilter.name
+    res["parameters"] = []
     for i in range(len(dFilter.parameters)) : 
-        res["param" + str(i+1)] = dFilter.parameters[i]
+        res["parameters"].append(dFilter.parameters[i])
     return res 
 
+if __name__ == "__main__" : 
+    import os 
+    print("=== This is a test message ===")
+    CUR_DIR = os.path.dirname(os.path.abspath(__file__))
+    listFilters = json.load(open(CUR_DIR + r"\listeProcedures.json", "r"))
+    print(convertDictToFilter(listFilters[0]).toString())

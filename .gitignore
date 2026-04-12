@@ -3,6 +3,7 @@
 *.jpeg
 *.txt
 *.png
+*.json
+*.code-workspace
 __pycache__
-mainCopy.py
-FileProcessorCopy.py
+temp\*

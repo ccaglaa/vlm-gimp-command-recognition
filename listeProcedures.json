@@ -1,29 +1,54 @@
 [
 	{
-		"procedureName": "gegl:shift",
+		"procedureName": "gegl:gaussian-blur",
 		"param1": {
-			"name": "shift",
-			"type": "gint",
+			"name": "std-dev-x",
+			"type": "gdouble",
 			"field": {
-				"minVal": 0,
-				"maxVal": 200
+				"minVal": 0.00,
+				"maxVal": 1500.00
 			}
 		},
-		"param2": {
-			"name": "direction",
-			"type": "gchararray",
-			"field": [
-				"horizontal",
-				"vertical"
-			]
-		},
-		"param3": {
-			"name": "seed",
-			"type": "guint",
-			"field": {
-				"minVal": 0,
-				"maxVal": "+inf"
+		"parameters": [
+			{
+				"name": "std-dev-x",
+				"type": "gdouble",
+				"field": {
+					"minVal": 0.00,
+					"maxVal": 1500.00
+				}
+			},
+			{
+				"name": "std-dev-y",
+				"type": "gdouble",
+				"field": {
+					"minVal": 0.00,
+					"maxVal": 1500.00
+				}
+			},
+			{
+				"name": "filter",
+				"type": "gchararray",
+				"field": [
+					"auto",
+					"fir",
+					"iir"
+				]
+			},
+			{
+				"name": "abyss-policy",
+				"type": "gchararray",
+				"field": [
+					"none",
+					"clamp",
+					"black",
+					"white"
+				]
+			},
+			{
+				"name": "clip-extent",
+				"type": "gboolean"
 			}
-		}
+		]
 	}
 ]

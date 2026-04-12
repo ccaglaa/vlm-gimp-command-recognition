@@ -69,7 +69,6 @@ def processOneFileOneFilter(
             case RunType.RANDOM : 
                 rVal = p.getRandomValue()
                 config.set_property(p.name, rVal)
-                print("Pour : " + p.name + " chosen value : " + str(rVal))
 
     # On met à jour le filtre 
     gFilter.update()
