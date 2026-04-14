@@ -1,171 +1,195 @@
 import json
-import tkinter as tk 
-import tkinter.ttk as ttk 
-import mainFile 
-import os 
+import tkinter as tk
+import tkinter.ttk as ttk
+import tkinter.filedialog as filedialog
+from typing import List
+import mainFile
+import os
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 
-FOLDERS = [
-    "Destination_Folder",
-    "Source_Folder"
-]
+FOLDERS = ["Destination_Folder", "Source_Folder"]
 
 DICT_KEY_TO_STRING = {
-    "Destination_Folder" : "Current Destination Folder : ",
-    "Source_Folder" : "Current Source Folder : "
+    "Destination_Folder": "Current Destination Folder : ",
+    "Source_Folder": "Current Source Folder : ",
 }
 
-options = dict()
-"""
-If the settingsFile.json doesn't exists in the current folder, 
-we create a new settingsFile.json with default settings 
-"""
-
-if (not os.path.isfile(CUR_DIR + r"\settingsFile.json")) :
-
-    f = open(CUR_DIR + r"\settingsFile.json", "w")
-    toWrite = dict()
-
-    for e in FOLDERS : 
-        toWrite[e] = os.path.dirname(os.path.abspath(__file__)) + "\\" + e
-
-    json.dump(toWrite, f)
-    f.close()
+SETTINGS_FILE = CUR_DIR + r"\settingsFile.json"
 
 
+def setupFunc():
+    """
+    This function allows us to setup the settings file if it dosen't
+    exist
+    """
 
-with open(CUR_DIR + r"\settingsFile.json", "r") as f : 
-    options = json.load(f)
+    options = dict()
 
-for e in FOLDERS : 
+    if not os.path.isfile(SETTINGS_FILE):
 
-    if (not os.path.isdir(options[e])) :
-        defaultFolder = os.path.dirname(os.path.abspath(__file__)) + "\\" + e 
-        # If the folder for source files is not correctly formed, create a default folder 
+        f = open(SETTINGS_FILE, "w")
+        toWrite = dict()
 
-        if (not os.path.isdir(defaultFolder)) : 
-            # If the folder doesn't exists, create it 
-            os.mkdir(defaultFolder)
+        for e in FOLDERS:
+            toWrite[e] = os.path.dirname(os.path.abspath(__file__)) + "\\" + e
 
-        options[e] = defaultFolder
-
-options["Current_Folder"] = os.path.dirname(os.path.abspath(__file__))
-    
-fw = open(CUR_DIR + r"\settingsFile.json", "w")
-json.dump(options, fw)
-fw.close()
-
-
-def registerValue(ent, val) :
-
-    def tempFunc() :
-        res = ent.get()
-        d = dict()
-
-        with open(CUR_DIR + r"\settingsFile.json", "r" ) as f : 
-            d = json.load(f)
-            if (os.path.isdir(res) or True) : 
-                d[val] = res 
-
-        f = open(CUR_DIR + r"\settingsFile.json", "w")
-        json.dump(d, f)
+        json.dump(toWrite, f)
         f.close()
+
+    with open(SETTINGS_FILE, "r") as f:
+        options = json.load(f)
+
+    for e in FOLDERS:
+
+        if not os.path.isdir(options[e]):
+            defaultFolder = os.path.dirname(os.path.abspath(__file__)) + "\\" + e
+            # If the folder for source files is not correctly formed, create a default folder
+
+            if not os.path.isdir(defaultFolder):
+                # If the folder doesn't exists, create it
+                os.mkdir(defaultFolder)
+
+            options[e] = defaultFolder
+
+    options["Current_Folder"] = os.path.dirname(os.path.abspath(__file__))
+
+    fw = open(SETTINGS_FILE, "w")
+    json.dump(options, fw)
+    fw.close()
+
+
+def updateSetting(ent: tk.Entry, key: str):
+    """
+    Updates the settings file with the input from
+    the ent Widget
+    """
+
+    def tempFunc():
+
+        settingsDict = None
+        with open(SETTINGS_FILE, "r") as f:
+            settingsDict = json.load(f)
+
+        potentialNewDir = ent.get()
+
+        if os.path.isdir(potentialNewDir):
+            settingsDict[key] = ent.get()
+            fw = open(SETTINGS_FILE, "w")
+            json.dump(settingsDict, fw)
+            fw.close()
+
+    return tempFunc()
+
+
+
+def selectFolder(ent: tk.Entry):
+    """
+    If called, will prompt the user to select a folder
+    and then update the entry passed as a parameter with this folder path
+    """
+
+    def tempFunc():
+        folderPath = filedialog.askdirectory(
+            initialdir=CUR_DIR, title="Select a directory"
+        )
+
+        if len(folderPath) > 0:
+            ent.delete(0, tk.END)
+            ent.insert(0, folderPath)
 
     return tempFunc
 
-window = tk.Tk()
 
-options = None 
-with open(CUR_DIR + r"\settingsFile.json", "r") as f : 
-    options = json.load(f)
+if __name__ == "__main__":
 
-lbl_destFolder = tk.Label(
-    master = window, 
-    text = DICT_KEY_TO_STRING["Destination_Folder"],
-    width = len(DICT_KEY_TO_STRING["Destination_Folder"]) - 1,
-    height=2,
-    justify="right",
-    anchor="e"
-)
+    setupFunc()
+    optionsInit = json.load(open(SETTINGS_FILE, "r"))
 
-ent_destFolder = tk.Entry(
-    master = window,
-    width=100
-)
+    window = tk.Tk()
 
-ent_destFolder.insert(0, options["Destination_Folder"])
-lbl_destFolder.grid(row=0, column=0)
-ent_destFolder.grid(row=0, column=1)
+    window.title("Folder Selection")
 
-lbl_srcFolder = tk.Label(
-    master = window, 
-    text = DICT_KEY_TO_STRING["Source_Folder"],
-    width = len(DICT_KEY_TO_STRING["Destination_Folder"]) - 1,
-    height=2,
-    justify="right",
-    anchor="e",
-)
+    # The row for the source folder
 
-ent_srcFolder = tk.Entry(
-    master = window,
-    width=100,
-) 
+    lbl_sourceFolder = tk.Label(
+        master=window,
+        text=DICT_KEY_TO_STRING["Source_Folder"],
+        width=24,
+        height=2,
+        anchor="e",
+    )
 
-ent_srcFolder.insert(0, options["Source_Folder"])
-lbl_srcFolder.grid(row=1, column=0)
-ent_srcFolder.grid(row=1, column=1)
+    ent_sourceFolder = tk.Entry(master=window, width=65)
 
-def updateLabels() :
+    ent_sourceFolder.insert(0, optionsInit["Source_Folder"])
 
-    ent_destFolder.delete(0, tk.END)
-    ent_srcFolder.delete(0, tk.END)
+    btn_sourceFolder = tk.Button(
+        master=window,
+        text="Select Folder",
+        command=selectFolder(ent_sourceFolder),
+        relief=tk.RIDGE,
+        borderwidth=5,
+    )
 
-    values = None
-    with open(CUR_DIR + r"\settingsFile.json", "r") as f :
-        values = json.load(f)
+    lbl_sourceFolder.grid(row=0, column=0)
+    ent_sourceFolder.grid(row=0, column=1)
+    btn_sourceFolder.grid(row=0, column=2, padx=5)
 
-    ent_destFolder.insert(0, values["Destination_Folder"])
-    ent_srcFolder.insert(0, values["Source_Folder"])
+    # The row for the destination folder
 
-def cmdForAccept() :
-    registerValue(ent_srcFolder, "Source_Folder")()
-    registerValue(ent_destFolder, "Destination_Folder")()
-    updateLabels()
-    return 
+    lbl_destFolder = tk.Label(
+        master=window,
+        text=DICT_KEY_TO_STRING["Destination_Folder"],
+        width=24,
+        height=2,
+        anchor="e",
+    )
+    ent_destFolder = tk.Entry(master=window, width=65)
 
-def cmdForReset() :
+    ent_destFolder.insert(0, optionsInit["Destination_Folder"])
 
-    toWrite = dict()
+    btn_destFolder = tk.Button(
+        master=window,
+        text="Select Folder",
+        command=selectFolder(ent_destFolder),
+        relief=tk.RIDGE,
+        borderwidth=5,
+    )
 
-    for e in FOLDERS : 
-        defaultFolder = os.path.dirname(os.path.abspath(__file__)) + "\\" + e 
-        toWrite[e] = defaultFolder
+    lbl_destFolder.grid(row=1, column=0)
+    ent_destFolder.grid(row=1, column=1)
+    btn_destFolder.grid(row=1, column=2, padx=5)
 
-    toWrite["Current_Folder"] = os.path.dirname(os.path.abspath(__file__))
-        
-    fw = open(CUR_DIR + r"\settingsFile.json", "w")
-    json.dump(options, fw)
-    fw.close()
-    updateLabels()
-    
+    # Button to actually update the settings of the file
+    # with the entries Widgets
 
-btn_accept = tk.Button(
-    text="Enregistrer",
-    height=2,
-    command=cmdForAccept
-)
+    def updateAll():
+        updateSetting(ent_sourceFolder, "Source_Folder")
+        updateSetting(ent_destFolder, "Destination_Folder")
 
-btn_reset = tk.Button(
-    text="Réinitialiser",
-    height=2,
-    command=cmdForReset
-)
+    btn_confirm = tk.Button(
+        text="Confirm", command=updateAll, relief=tk.RIDGE, borderwidth=5
+    )
 
+    btn_confirm.grid(row=2, column=0, padx=5)
 
+    def resetSettings() : 
+        os.remove(SETTINGS_FILE)
+        setupFunc()
 
+        settingsDict = json.load(open(SETTINGS_FILE, "r"))
 
-btn_accept.grid(row=2, column=0)
-btn_reset.grid(row=3, column=0)
+        ent_sourceFolder.delete(0, tk.END)
+        ent_destFolder.delete(0, tk.END)
 
-window.mainloop()
+        ent_sourceFolder.insert(0, settingsDict["Source_Folder"])
+        ent_destFolder.insert(0, settingsDict["Destination_Folder"])
+
+    btn_reset = tk.Button(
+        text="Reset Settings", command=resetSettings, relief=tk.RIDGE, borderwidth=5
+    )
+
+    btn_reset.grid(row=2, column=1, padx=5)
+
+    window.mainloop()

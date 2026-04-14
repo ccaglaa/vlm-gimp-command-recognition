@@ -70,7 +70,8 @@ def launchProcessOneFilter(
     
     return True 
 
-def main () :
+
+if __name__ == "__main__" : 
 
     procedureList = None 
 
@@ -90,5 +91,3 @@ def main () :
         filterClass = FilterTypes.convertDictToFilter(procedure)
 
         launchProcessOneFilter(processMode, filterClass)
-
-main()
