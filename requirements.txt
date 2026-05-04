@@ -1,0 +1,18 @@
+# inference server dependencies
+# Python 3.9+ 
+
+# inference
+torch>=2.1.0
+transformers>=4.45.0
+accelerate>=0.26.0
+peft>=0.9.0
+
+# vision model
+qwen-vl-utils>=0.0.8
+
+# server
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+
+# image handling
+Pillow>=10.0.0
