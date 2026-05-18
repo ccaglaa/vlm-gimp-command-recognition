@@ -1,15 +1,20 @@
 # PAI2D — Assistant GIMP par VLM
-Sorbonne Université 2025-2026
+Sorbonne Université — Master AI2D 2025-2026
 
-Observe le canvas GIMP toutes les 10s. Quand il détecte un changement, il suggère la commande GIMP optimale qui aurait produit le même résultat en un clic.
+Projet encadré par **Julien Gori**, **Olivier Schwander** et **Gilles Bailly**.
+Réalisé par **Çagla Koprulu**, **Riadh Ouazib**, **Andy Ngo** et **Louiza Chenaoui**.
+
+L'idée : les utilisateurs de logiciels complexes n'exploitent qu'une infime partie des commandes disponibles. Ce système observe le canvas GIMP avant et après une action, et suggère la commande native qui aurait produit le même résultat en un clic.
 
 ---
 
 ## Structure du dépôt
 
-- **`Plugin3/`** — Plugin GIMP et serveur d'inférence FastAPI
-- **`entrainement/`** — Notebooks Kaggle pour le fine-tuning QLoRA du modèle (Qwen2-VL-2B-Instruct)
-- **`generation_dataset/`** — Scripts de génération du dataset (2 versions) : génération des composites via l'API Python-Fu de GIMP
+- **`plugin.py`** — Plugin GIMP (Python-Fu), capture le canvas et envoie les composites au serveur
+- **`server.py`** — Serveur d'inférence FastAPI, charge le modèle et retourne les prédictions
+- **`requirements.txt`** — Dépendances Python du serveur
+- **`entrainement/`** — Notebooks Kaggle pour le fine-tuning QLoRA (Qwen2-VL-2B-Instruct)
+- **`generation_dataset/`** — Scripts de génération du dataset (2 versions) via l'API Python-Fu de GIMP
 
 ---
 
@@ -51,17 +56,19 @@ pip install -r requirements.txt
 
 ### 2. Plugin GIMP
 
-Le dossier et le fichier doivent avoir le même nom.
+Le dossier et le fichier doivent avoir le même nom — contrainte de GIMP 3.x.
 
 **macOS**
 ```bash
-cp -r Plugin3 ~/Library/Application\ Support/GIMP/3.2/plug-ins/
+mkdir -p ~/Library/Application\ Support/GIMP/3.2/plug-ins/Plugin3
+cp plugin.py ~/Library/Application\ Support/GIMP/3.2/plug-ins/Plugin3/Plugin3.py
 chmod +x ~/Library/Application\ Support/GIMP/3.2/plug-ins/Plugin3/Plugin3.py
 ```
 
 **Linux**
 ```bash
-cp -r Plugin3 ~/.config/GIMP/3.2/plug-ins/
+mkdir -p ~/.config/GIMP/3.2/plug-ins/Plugin3
+cp plugin.py ~/.config/GIMP/3.2/plug-ins/Plugin3/Plugin3.py
 chmod +x ~/.config/GIMP/3.2/plug-ins/Plugin3/Plugin3.py
 ```
 
@@ -69,18 +76,18 @@ Redémarrer GIMP après l'installation.
 
 ### 3. Modèle
 
-Télécharger le modèle depuis HuggingFace (voir tableau ci-dessus) ou utiliser directement l'identifiant HuggingFace dans la commande de lancement.
+Télécharger depuis HuggingFace (voir tableau ci-dessus) ou utiliser directement l'identifiant dans la commande de lancement.
 
 ---
 
 ## Lancement
 
-### Étape 1: Démarrer le serveur
+### Étape 1 : Démarrer le serveur
 
 ```bash
 source venv/bin/activate
 
-# Depuis HuggingFace (recommandé)
+# Depuis HuggingFace
 MODEL_PATH=ccaglaa/qwen2vl-2b-gimp-ai2d-v3 uvicorn server:app --host 0.0.0.0 --port 8000
 
 # Depuis un dossier local
@@ -89,13 +96,13 @@ MODEL_PATH=/chemin/vers/qwen2vl-gimp-lora uvicorn server:app --host 0.0.0.0 --po
 
 Attendre : `Modèle prêt` et `Application startup complete.`
 
-### Étape 2: Démarrer le plugin dans GIMP
+### Étape 2 : Démarrer le plugin dans GIMP
 
 1. Ouvrir GIMP avec une image
 2. **Filtres → Plugin3 → Démarrer la surveillance**
 3. Le panneau flottant "Assistant GIMP" apparaît
 
-### Étape 3: Utiliser
+### Étape 3 : Utiliser
 
 Appliquer n'importe quel filtre ou transformation dans GIMP. Le système détecte le changement, envoie les images au serveur, et affiche une suggestion dans le panneau.
 
@@ -103,7 +110,7 @@ Appliquer n'importe quel filtre ou transformation dans GIMP. Le système détect
 
 ## Paramètres
 
-Dans `Plugin3.py` :
+Dans `plugin.py` :
 | Variable | Valeur | Description |
 |----------|--------|-------------|
 | `DELTA_THRESHOLD` | `1.5` | Différence pixel minimale pour déclencher l'inférence (1.5 = détecte les yeux rouges) |
