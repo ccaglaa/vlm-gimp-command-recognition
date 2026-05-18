@@ -8,6 +8,10 @@ L'idée : les utilisateurs de logiciels complexes n'exploitent qu'une infime par
 
 ---
 
+```markdown
+[![Démo PAI2D](https://img.youtube.com/vi/y76A7swac5c/0.jpg)](https://youtu.be/y76A7swac5c)
+```
+
 ## Structure du dépôt
 
 - **`plugin.py`** — Plugin GIMP (Python-Fu), capture le canvas et envoie les composites au serveur
