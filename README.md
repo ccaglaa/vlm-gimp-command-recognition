@@ -5,6 +5,31 @@ Observe le canvas GIMP toutes les 10s. Quand il détecte un changement, il sugg�
 
 ---
 
+## Structure du dépôt
+
+- **`Plugin3/`** — Plugin GIMP et serveur d'inférence FastAPI
+- **`entrainement/`** — Notebooks Kaggle pour le fine-tuning QLoRA du modèle (Qwen2-VL-2B-Instruct)
+- **`generation_dataset/`** — Scripts de génération du dataset (2 versions) : génération des composites via l'API Python-Fu de GIMP
+
+---
+
+## Modèles (HuggingFace)
+
+| Lien | Classes | Format |
+|------|---------|--------|
+| [ccaglaa/qwen2vl-gimp-lora](https://huggingface.co/ccaglaa/qwen2vl-gimp-lora) | 20 | double panneau |
+| [ccaglaa/qwen2vl-2b-gimp-ai2d-v3](https://huggingface.co/ccaglaa/qwen2vl-2b-gimp-ai2d-v3/tree/main) | 13 | triptyque |
+| [Riadhouazib/qwen2vl-gimp-lora-40cmd](https://huggingface.co/Riadhouazib/qwen2vl-gimp-lora-40cmd/tree/main/modele) | 40 | triptyque |
+
+## Datasets (Kaggle)
+
+| Lien | Classes |
+|------|---------|
+| [pai2d-train-dataset-v4](https://www.kaggle.com/datasets/ccaglaa/pai2d-train-dataset-v4) | 40 |
+| [ai2d-v3-dataset](https://www.kaggle.com/datasets/ccaglaa/ai2d-v3-dataset) | 13 |
+
+---
+
 ## Prérequis
 
 - GIMP 3.2.x
@@ -44,7 +69,7 @@ Redémarrer GIMP après l'installation.
 
 ### 3. Modèle
 
-Télécharger le dossier `qwen2vl-gimp-lora` depuis le lien partagé et le placer où vous voulez sur votre machine.
+Télécharger le modèle depuis HuggingFace (voir tableau ci-dessus) ou utiliser directement l'identifiant HuggingFace dans la commande de lancement.
 
 ---
 
@@ -54,6 +79,11 @@ Télécharger le dossier `qwen2vl-gimp-lora` depuis le lien partagé et le place
 
 ```bash
 source venv/bin/activate
+
+# Depuis HuggingFace (recommandé)
+MODEL_PATH=ccaglaa/qwen2vl-2b-gimp-ai2d-v3 uvicorn server:app --host 0.0.0.0 --port 8000
+
+# Depuis un dossier local
 MODEL_PATH=/chemin/vers/qwen2vl-gimp-lora uvicorn server:app --host 0.0.0.0 --port 8000
 ```
 
