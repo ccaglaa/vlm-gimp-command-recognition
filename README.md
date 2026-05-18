@@ -1,3 +1,5 @@
+![GIMP](https://img.shields.io/badge/GIMP-3.2-blue?logo=gimp)
+![Python](https://img.shields.io/badge/Python-3.9+-yellow?logo=python)
 # PAI2D — Assistant GIMP par VLM
 Sorbonne Université — Master AI2D 2025-2026
 
