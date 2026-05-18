@@ -1,0 +1,4 @@
+qwen2vl-gimp-lora/
+venv/
+__pycache__/
+*.safetensors
